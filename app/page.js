@@ -1,15 +1,40 @@
 'use client'
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Drawer from '@mui/material/Drawer';
+import CssBaseline from '@mui/material/CssBaseline';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import List from '@mui/material/List';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import HomeIcon from '@mui/icons-material/Home';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import { createTheme, ThemeProvider} from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
+const drawerWidth = 200;
+const headerHeight = 64;
 
-import { Box, Button, Stack, TextField } from '@mui/material'
-import { useState } from 'react'
 
 export default function Home() {
+  const scrollRef = useRef(null);
+  const [name, setName] = useState('Chris')
+
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hi! I'm the Headstarter support assistant. How can I help you today?",
+      content: `Hi! I'm the Headstarter career coach. How can I help you today ${name}?`,
     },
   ])
+
   const [message, setMessage] = useState('')
 
   const sendMessage = async () => {
@@ -60,65 +85,190 @@ export default function Home() {
     }
   }
 
+  // aut scroll to bottom of chat
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  const theme = createTheme({
+    palette: {
+      background: {
+        default: '#edf0fa',
+        white: '#ffffff'
+      },
+      primary: {
+        main: '#6a83f5',
+      },
+      secondary: {
+        main: '#ffffff',
+      },
+    },
+    components: {
+      MuiButtonBase: {
+        defaultProps: {
+          disableRipple: false
+        },
+        styleOverrides: {
+          root: {
+            borderRadius: '14px'
+          }
+        }
+      }
+    }
+  });
+
   return (
-    <Box
-      width="100vw"
-      height="100vh"
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Stack
-        direction={'column'}
-        width="500px"
-        height="700px"
-        border="1px solid black"
-        p={2}
-        spacing={3}
-      >
-        <Stack
-          direction={'column'}
-          spacing={2}
-          flexGrow={1}
-          overflow="auto"
-          maxHeight="100%"
+    <ThemeProvider theme={theme}>
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <AppBar
+          position="fixed"
+          height={headerHeight}
+          elevation={0}
+          sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
         >
-          {messages.map((message, index) => (
-            <Box
-              key={index}
-              display="flex"
-              justifyContent={
-                message.role === 'assistant' ? 'flex-start' : 'flex-end'
-              }
+          <Toolbar elevation={0} sx={{ bgcolor: 'background.white', color: 'black'}} spacing={2} >
+            <AccountCircleIcon/>
+            <Typography variant="h6" noWrap component="div">
+              Hello {name}
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+            },
+          }}
+          variant="permanent"
+          anchor="left"
+        >
+          <Toolbar elevation={0} sx={{ bgcolor: 'background.white', color: 'black'}} spacing={2} >
+            <Typography variant="h6" noWrap component="div">
+              Pathfinder AI
+            </Typography>
+          </Toolbar>
+          <Divider />
+          <List color='black' spacing={1}>
+            {/* Home */}
+            <ListItem key={'Home'} disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <HomeIcon/>
+                </ListItemIcon>
+                <ListItemText primary={'Home'} />
+              </ListItemButton>
+            </ListItem>
+            {/* Chat */}
+            <ListItem key={'Chat'} disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <ChatBubbleIcon/>
+                </ListItemIcon>
+                <ListItemText primary={'Chat'} />
+              </ListItemButton>
+            </ListItem>
+            {/* Login */}
+            <ListItem key={'Login'} disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <AccountCircleIcon/>
+                </ListItemIcon>
+                <ListItemText primary={'Login'} />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Drawer>
+        <Box
+          component="main"
+          height={'100vh'}
+          sx={{ flexGrow: 1, bgcolor: 'background.white', p: 3, paddingTop: 0}}
+        >
+          {/* offset by headerheight so bot takes full space */}
+          <Box height={headerHeight}> 
+          </Box>
+          {/* chat bot goes here */}
+          <Box
+            width="100%"
+            height={`calc(100vh - ${headerHeight}px)`}
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            sx={{ bgcolor: 'background.default'}}
+            borderRadius={5}
+          >
+            <Stack
+              direction={'column'}
+              width="100%"
+              height="100%"
+              p={2}
+              spacing={3}
             >
-              <Box
-                bgcolor={
-                  message.role === 'assistant'
-                    ? 'primary.main'
-                    : 'secondary.main'
-                }
-                color="white"
-                borderRadius={16}
-                p={3}
+              <Stack
+                direction={'column'}
+                spacing={2}
+                flexGrow={1}
+                overflow="auto"
+                maxHeight="100%"
               >
-                {message.content}
-              </Box>
-            </Box>
-          ))}
-        </Stack>
-        <Stack direction={'row'} spacing={2}>
-          <TextField
-            label="Message"
-            fullWidth
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-          <Button variant="contained" onClick={sendMessage}>
-            Send
-          </Button>
-        </Stack>
-      </Stack>
-    </Box>
-  )
+                {messages.map((message, index) => (
+                  <Box
+                    key={index}
+                    display="flex"
+                    justifyContent={
+                      message.role === 'assistant' ? 'flex-start' : 'flex-end'
+                    }
+                  >
+                    <Box
+                      maxWidth={'65%'}
+                      bgcolor={
+                        message.role === 'assistant'
+                          ? 'secondary.main'
+                          : 'primary.main'
+                      }
+                      color={
+                        message.role === 'assistant'
+                          ? 'black'
+                          : 'white'
+                      }
+                      borderRadius={5}
+                      p={3}
+                    >
+                      {message.content}
+                    </Box>
+
+                  </Box>
+                ))}
+                {/* This box will always be in view, thus facilitating an auto scroll feature when new messages are sent and recieved */}
+                <Box ref={scrollRef}></Box>
+              </Stack>
+              <Stack direction={'row'} spacing={2}>
+                <TextField
+                  label="Message . . ."
+                  fullWidth
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  disableBorder
+                  InputProps={{
+                    style: {
+                      borderRadius: "14px",
+                    }
+                  }}
+                />
+                <Button variant="contained" onClick={sendMessage} sx={{ borderRadius: '14px'}}>
+                  Send
+                </Button>
+              </Stack>
+            </Stack>
+          </Box>
+        </Box>
+      </Box>
+    </ThemeProvider>
+  );
 }
